@@ -172,6 +172,9 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
 		    &inet_sockopt))
 		goto errout;
 
+	if (sock_diag_put_sk_opts(sk, skb, INET_DIAG_SK_OPTS))
+		goto errout;
+
 	return 0;
 errout:
 	return 1;
