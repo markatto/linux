@@ -40,6 +40,7 @@ enum {
 	NETLINK_DIAG_RX_RING,
 	NETLINK_DIAG_TX_RING,
 	NETLINK_DIAG_FLAGS,
+	NETLINK_DIAG_SK_OPTS,
 
 	__NETLINK_DIAG_MAX,
 };
@@ -55,6 +56,7 @@ enum {
 #define NDIAG_SHOW_RING_CFG	0x00000004 /* show ring configuration */
 #endif
 #define NDIAG_SHOW_FLAGS	0x00000008 /* show flags of a netlink socket */
+#define NDIAG_SHOW_SK_OPTS	0x00000010 /* show SOL_SOCKET options */
 
 /* flags */
 #define NDIAG_FLAG_CB_RUNNING		0x00000001
