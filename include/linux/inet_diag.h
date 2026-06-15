@@ -4,6 +4,7 @@
 
 #include <net/netlink.h>
 #include <uapi/linux/inet_diag.h>
+#include <linux/sock_diag.h>
 
 struct inet_hashinfo;
 
@@ -70,6 +71,8 @@ static inline size_t inet_diag_msg_attrs_size(void)
 #endif
 		+ nla_total_size(sizeof(struct inet_diag_sockopt))
 						     /* INET_DIAG_SOCKOPT */
+		+ nla_total_size(sizeof(struct sock_diag_sk_opts))
+						     /* INET_DIAG_SK_OPTS */
 		;
 }
 int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
