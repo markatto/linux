@@ -26,6 +26,37 @@ enum {
 	SK_MEMINFO_VARS,
 };
 
+/* SOL_SOCKET-level boolean options (see socket(7)), reported per socket via
+ * each family's *_DIAG_SK_OPTS attribute. That attribute is a struct
+ * nla_bitfield32 filled by sock_diag_put_sk_opts() from the generic struct
+ * sock: its selector marks the options the running kernel knows how to report
+ * and its value carries the ones that are set, so userspace can tell a cleared
+ * option from one the kernel does not report and new options can be added
+ * without growing a fixed struct. Every family reports them the same way.
+ *
+ * SK_DIAG_OPT_TIMESTAMP and SK_DIAG_OPT_TIMESTAMPNS report the SO_TIMESTAMP /
+ * SO_TIMESTAMPNS receive mode regardless of the _OLD/_NEW timeval-width
+ * variant; that width split is a userspace ABI detail and is not reported here.
+ */
+enum {
+	SK_DIAG_OPT_REUSEADDR		= 1 << 0,
+	SK_DIAG_OPT_REUSEPORT		= 1 << 1,
+	SK_DIAG_OPT_KEEPALIVE		= 1 << 2,
+	SK_DIAG_OPT_BROADCAST		= 1 << 3,
+	SK_DIAG_OPT_OOBINLINE		= 1 << 4,
+	SK_DIAG_OPT_DONTROUTE		= 1 << 5,
+	SK_DIAG_OPT_LINGER		= 1 << 6,
+	SK_DIAG_OPT_TIMESTAMP		= 1 << 7,
+	SK_DIAG_OPT_DEBUG		= 1 << 8,
+	SK_DIAG_OPT_ZEROCOPY		= 1 << 9,
+	SK_DIAG_OPT_TXTIME		= 1 << 10,
+	SK_DIAG_OPT_RXQ_OVFL		= 1 << 11,
+	SK_DIAG_OPT_SELECT_ERR_QUEUE	= 1 << 12,
+	SK_DIAG_OPT_NOFCS		= 1 << 13,
+	SK_DIAG_OPT_RCVMARK		= 1 << 14,
+	SK_DIAG_OPT_TIMESTAMPNS		= 1 << 15,
+};
+
 enum sknetlink_groups {
 	SKNLGRP_NONE,
 	SKNLGRP_INET_TCP_DESTROY,

@@ -73,6 +73,56 @@ int sock_diag_put_meminfo(struct sock *sk, struct sk_buff *skb, int attrtype)
 }
 EXPORT_SYMBOL_GPL(sock_diag_put_meminfo);
 
+int sock_diag_put_sk_opts(struct sock *sk, struct sk_buff *skb, int attrtype)
+{
+	u32 selector = SK_DIAG_OPT_REUSEADDR | SK_DIAG_OPT_REUSEPORT |
+		       SK_DIAG_OPT_KEEPALIVE | SK_DIAG_OPT_BROADCAST |
+		       SK_DIAG_OPT_OOBINLINE | SK_DIAG_OPT_DONTROUTE |
+		       SK_DIAG_OPT_LINGER | SK_DIAG_OPT_TIMESTAMP |
+		       SK_DIAG_OPT_DEBUG | SK_DIAG_OPT_ZEROCOPY |
+		       SK_DIAG_OPT_TXTIME | SK_DIAG_OPT_RXQ_OVFL |
+		       SK_DIAG_OPT_SELECT_ERR_QUEUE | SK_DIAG_OPT_NOFCS |
+		       SK_DIAG_OPT_RCVMARK | SK_DIAG_OPT_TIMESTAMPNS;
+	u32 value = 0;
+
+	if (sk->sk_reuse)
+		value |= SK_DIAG_OPT_REUSEADDR;
+	if (sk->sk_reuseport)
+		value |= SK_DIAG_OPT_REUSEPORT;
+	if (sock_flag(sk, SOCK_KEEPOPEN))
+		value |= SK_DIAG_OPT_KEEPALIVE;
+	if (sock_flag(sk, SOCK_BROADCAST))
+		value |= SK_DIAG_OPT_BROADCAST;
+	if (sock_flag(sk, SOCK_URGINLINE))
+		value |= SK_DIAG_OPT_OOBINLINE;
+	if (sock_flag(sk, SOCK_LOCALROUTE))
+		value |= SK_DIAG_OPT_DONTROUTE;
+	if (sock_flag(sk, SOCK_LINGER))
+		value |= SK_DIAG_OPT_LINGER;
+	/* SO_TIMESTAMP and SO_TIMESTAMPNS share SOCK_RCVTSTAMP; split them. */
+	if (sock_flag(sk, SOCK_RCVTSTAMP) && !sock_flag(sk, SOCK_RCVTSTAMPNS))
+		value |= SK_DIAG_OPT_TIMESTAMP;
+	if (sock_flag(sk, SOCK_RCVTSTAMPNS))
+		value |= SK_DIAG_OPT_TIMESTAMPNS;
+	if (sock_flag(sk, SOCK_DBG))
+		value |= SK_DIAG_OPT_DEBUG;
+	if (sock_flag(sk, SOCK_ZEROCOPY))
+		value |= SK_DIAG_OPT_ZEROCOPY;
+	if (sock_flag(sk, SOCK_TXTIME))
+		value |= SK_DIAG_OPT_TXTIME;
+	if (sock_flag(sk, SOCK_RXQ_OVFL))
+		value |= SK_DIAG_OPT_RXQ_OVFL;
+	if (sock_flag(sk, SOCK_SELECT_ERR_QUEUE))
+		value |= SK_DIAG_OPT_SELECT_ERR_QUEUE;
+	if (sock_flag(sk, SOCK_NOFCS))
+		value |= SK_DIAG_OPT_NOFCS;
+	if (sock_flag(sk, SOCK_RCVMARK))
+		value |= SK_DIAG_OPT_RCVMARK;
+
+	return nla_put_bitfield32(skb, attrtype, value, selector);
+}
+EXPORT_SYMBOL_GPL(sock_diag_put_sk_opts);
+
 int sock_diag_put_filterinfo(bool may_report_filterinfo, struct sock *sk,
 			     struct sk_buff *skb, int attrtype)
 {
