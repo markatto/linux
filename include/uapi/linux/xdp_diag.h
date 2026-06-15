@@ -31,6 +31,7 @@ struct xdp_diag_msg {
 #define XDP_SHOW_UMEM		(1 << 2)
 #define XDP_SHOW_MEMINFO	(1 << 3)
 #define XDP_SHOW_STATS		(1 << 4)
+#define XDP_SHOW_SK_OPTS	(1 << 5) /* SOL_SOCKET options */
 
 enum {
 	XDP_DIAG_NONE,
@@ -43,6 +44,7 @@ enum {
 	XDP_DIAG_UMEM_COMPLETION_RING,
 	XDP_DIAG_MEMINFO,
 	XDP_DIAG_STATS,
+	XDP_DIAG_SK_OPTS,
 	__XDP_DIAG_MAX,
 };
 

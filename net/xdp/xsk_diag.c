@@ -134,6 +134,10 @@ static int xsk_diag_fill(struct sock *sk, struct sk_buff *nlskb,
 	    sock_diag_put_meminfo(sk, nlskb, XDP_DIAG_MEMINFO))
 		goto out_nlmsg_trim;
 
+	if ((req->xdiag_show & XDP_SHOW_SK_OPTS) &&
+	    sock_diag_put_sk_opts(sk, nlskb, XDP_DIAG_SK_OPTS))
+		goto out_nlmsg_trim;
+
 	if ((req->xdiag_show & XDP_SHOW_STATS) &&
 	    xsk_diag_put_stats(xs, nlskb))
 		goto out_nlmsg_trim;
