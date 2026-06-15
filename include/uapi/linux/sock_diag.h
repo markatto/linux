@@ -26,6 +26,33 @@ enum {
 	SK_MEMINFO_VARS,
 };
 
+/* SOL_SOCKET-level boolean options (see socket(7)), reported per socket via
+ * each family's *_DIAG_SK_OPTS attribute. Filled by sock_diag_put_sk_opts()
+ * from the generic struct sock, so every family reports them the same way.
+ *
+ * timestamp and timestampns report the SO_TIMESTAMP / SO_TIMESTAMPNS receive
+ * mode regardless of the _OLD/_NEW timeval-width variant; that width split is
+ * a userspace ABI detail and is not reported here.
+ */
+struct sock_diag_sk_opts {
+	__u8	reuseaddr:1,
+		reuseport:1,
+		keepalive:1,
+		broadcast:1,
+		oobinline:1,
+		dontroute:1,
+		linger:1,
+		timestamp:1;
+	__u8	debug:1,
+		zerocopy:1,
+		txtime:1,
+		rxq_ovfl:1,
+		select_err_queue:1,
+		nofcs:1,
+		rcvmark:1,
+		timestampns:1;
+};
+
 enum sknetlink_groups {
 	SKNLGRP_NONE,
 	SKNLGRP_INET_TCP_DESTROY,

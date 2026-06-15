@@ -73,6 +73,34 @@ int sock_diag_put_meminfo(struct sock *sk, struct sk_buff *skb, int attrtype)
 }
 EXPORT_SYMBOL_GPL(sock_diag_put_meminfo);
 
+int sock_diag_put_sk_opts(struct sock *sk, struct sk_buff *skb, int attrtype)
+{
+	struct sock_diag_sk_opts opts;
+
+	memset(&opts, 0, sizeof(opts));
+	opts.reuseaddr = !!sk->sk_reuse;
+	opts.reuseport = sk->sk_reuseport;
+	opts.keepalive = sock_flag(sk, SOCK_KEEPOPEN);
+	opts.broadcast = sock_flag(sk, SOCK_BROADCAST);
+	opts.oobinline = sock_flag(sk, SOCK_URGINLINE);
+	opts.dontroute = sock_flag(sk, SOCK_LOCALROUTE);
+	opts.linger = sock_flag(sk, SOCK_LINGER);
+	/* SO_TIMESTAMP and SO_TIMESTAMPNS share SOCK_RCVTSTAMP; split them. */
+	opts.timestamp = sock_flag(sk, SOCK_RCVTSTAMP) &&
+			 !sock_flag(sk, SOCK_RCVTSTAMPNS);
+	opts.debug = sock_flag(sk, SOCK_DBG);
+	opts.zerocopy = sock_flag(sk, SOCK_ZEROCOPY);
+	opts.txtime = sock_flag(sk, SOCK_TXTIME);
+	opts.rxq_ovfl = sock_flag(sk, SOCK_RXQ_OVFL);
+	opts.select_err_queue = sock_flag(sk, SOCK_SELECT_ERR_QUEUE);
+	opts.nofcs = sock_flag(sk, SOCK_NOFCS);
+	opts.rcvmark = sock_flag(sk, SOCK_RCVMARK);
+	opts.timestampns = sock_flag(sk, SOCK_RCVTSTAMPNS);
+
+	return nla_put(skb, attrtype, sizeof(opts), &opts);
+}
+EXPORT_SYMBOL_GPL(sock_diag_put_sk_opts);
+
 int sock_diag_put_filterinfo(bool may_report_filterinfo, struct sock *sk,
 			     struct sk_buff *skb, int attrtype)
 {
