@@ -36,7 +36,7 @@ struct devlink_port_phys_attrs {
  * struct devlink_port_pci_pf_attrs - devlink port's PCI PF attributes
  * @controller: Associated controller number
  * @pf: associated PCI function number for the devlink port instance
- * @external: when set, indicates if a port is for an external controller
+ * @external: when set, indicates if a port is for an external host controller.
  */
 struct devlink_port_pci_pf_attrs {
 	u32 controller;
@@ -50,7 +50,7 @@ struct devlink_port_pci_pf_attrs {
  * @pf: associated PCI function number for the devlink port instance
  * @vf: associated PCI VF number of a PF for the devlink port instance;
  *	VF number starts from 0 for the first PCI virtual function
- * @external: when set, indicates if a port is for an external controller
+ * @external: when set, indicates if a port is for an external host controller.
  */
 struct devlink_port_pci_vf_attrs {
 	u32 controller;
@@ -64,7 +64,7 @@ struct devlink_port_pci_vf_attrs {
  * @controller: Associated controller number
  * @sf: associated SF number of a PF for the devlink port instance
  * @pf: associated PCI function number for the devlink port instance
- * @external: when set, indicates if a port is for an external controller
+ * @external: when set, indicates if a port is for an external host controller.
  */
 struct devlink_port_pci_sf_attrs {
 	u32 controller;
@@ -433,6 +433,13 @@ enum devlink_param_type {
 	DEVLINK_PARAM_TYPE_U64 = DEVLINK_VAR_ATTR_TYPE_U64,
 	DEVLINK_PARAM_TYPE_STRING = DEVLINK_VAR_ATTR_TYPE_STRING,
 	DEVLINK_PARAM_TYPE_BOOL = DEVLINK_VAR_ATTR_TYPE_FLAG,
+	DEVLINK_PARAM_TYPE_U64_ARRAY = DEVLINK_VAR_ATTR_TYPE_U64_ARRAY,
+};
+
+#define __DEVLINK_PARAM_MAX_ARRAY_SIZE 32
+struct devlink_param_u64_array {
+	u64 size;
+	u64 val[__DEVLINK_PARAM_MAX_ARRAY_SIZE];
 };
 
 union devlink_param_value {
@@ -442,6 +449,7 @@ union devlink_param_value {
 	u64 vu64;
 	char vstr[__DEVLINK_PARAM_MAX_STRING_VALUE];
 	bool vbool;
+	struct devlink_param_u64_array u64arr;
 };
 
 struct devlink_param_gset_ctx {
@@ -501,7 +509,7 @@ struct devlink_param {
 		   struct devlink_param_gset_ctx *ctx,
 		   struct netlink_ext_ack *extack);
 	int (*validate)(struct devlink *devlink, u32 id,
-			union devlink_param_value val,
+			union devlink_param_value *val,
 			struct netlink_ext_ack *extack);
 	int (*get_default)(struct devlink *devlink, u32 id,
 			   struct devlink_param_gset_ctx *ctx,
@@ -1586,6 +1594,15 @@ struct devlink_ops {
 				    struct devlink_rate *parent,
 				    void *priv_child, void *priv_parent,
 				    struct netlink_ext_ack *extack);
+	/* Indicates if cross-device rate nodes are supported.
+	 * This also requires a shared common ancestor object all devices that
+	 * could share rate nodes are nested in.
+	 * If enabled, rate operations may be called on an instance with only
+	 * the common ancestor lock held and *without that instance lock held*.
+	 * It is the driver's responsibility to ensure proper serialization
+	 * with other operations.
+	 */
+	bool supported_cross_device_rate_nodes;
 	/**
 	 * selftests_check() - queries if selftest is supported
 	 * @devlink: devlink instance
@@ -1923,7 +1940,7 @@ void devlink_params_unregister(struct devlink *devlink,
 int devl_param_driverinit_value_get(struct devlink *devlink, u32 param_id,
 				    union devlink_param_value *val);
 void devl_param_driverinit_value_set(struct devlink *devlink, u32 param_id,
-				     union devlink_param_value init_val);
+				     union devlink_param_value *init_val);
 void devl_param_value_changed(struct devlink *devlink, u32 param_id);
 struct devlink_region *devl_region_create(struct devlink *devlink,
 					  const struct devlink_region_ops *ops,

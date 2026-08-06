@@ -172,6 +172,10 @@ static int sk_diag_fill(struct sock *sk, struct sk_buff *skb,
 	    sock_diag_put_meminfo(sk, skb, PACKET_DIAG_MEMINFO))
 		goto out_nlmsg_trim;
 
+	if ((req->pdiag_show & PACKET_SHOW_SK_OPTS) &&
+	    sock_diag_put_sk_opts(sk, skb, PACKET_DIAG_SK_OPTS))
+		goto out_nlmsg_trim;
+
 	if ((req->pdiag_show & PACKET_SHOW_FILTER) &&
 	    sock_diag_put_filterinfo(may_report_filterinfo, sk, skb,
 				     PACKET_DIAG_FILTER))

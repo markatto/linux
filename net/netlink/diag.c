@@ -74,6 +74,10 @@ static int sk_diag_fill(struct sock *sk, struct sk_buff *skb,
 	    sock_diag_put_meminfo(sk, skb, NETLINK_DIAG_MEMINFO))
 		goto out_nlmsg_trim;
 
+	if ((req->ndiag_show & NDIAG_SHOW_SK_OPTS) &&
+	    sock_diag_put_sk_opts(sk, skb, NETLINK_DIAG_SK_OPTS))
+		goto out_nlmsg_trim;
+
 	if ((req->ndiag_show & NDIAG_SHOW_FLAGS) &&
 	    sk_diag_put_flags(sk, skb))
 		goto out_nlmsg_trim;

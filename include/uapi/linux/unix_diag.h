@@ -21,6 +21,7 @@ struct unix_diag_req {
 #define UDIAG_SHOW_RQLEN	0x00000010	/* show skb receive queue len */
 #define UDIAG_SHOW_MEMINFO	0x00000020	/* show memory info of a socket */
 #define UDIAG_SHOW_UID		0x00000040	/* show socket's UID */
+#define UDIAG_SHOW_SK_OPTS	0x00000080	/* show SOL_SOCKET options */
 
 struct unix_diag_msg {
 	__u8	udiag_family;
@@ -42,6 +43,7 @@ enum {
 	UNIX_DIAG_MEMINFO,
 	UNIX_DIAG_SHUTDOWN,
 	UNIX_DIAG_UID,
+	UNIX_DIAG_SK_OPTS,
 
 	__UNIX_DIAG_MAX,
 };
